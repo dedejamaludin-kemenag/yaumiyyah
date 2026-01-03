@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Login Aplikasi</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="apple-touch-icon" href="logo.png">
+    <meta name="theme-color" content="#047857"> 
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-50 min-h-screen relative overflow-x-hidden">
+
+    <div class="absolute top-0 left-0 w-full h-80 bg-[#047857] rounded-b-[3rem] z-0 shadow-xl"></div>
+    
+    <div class="relative z-10 w-full max-w-sm mx-auto px-6 pt-14 pb-10">
+        
+        <div class="text-center mb-8">
+            <div class="w-24 h-24 bg-white rounded-3xl mx-auto shadow-lg flex items-center justify-center mb-4 text-[#047857]">
+                <i class="fa-solid fa-kaaba text-5xl"></i>
+            </div>
+            <h1 class="text-white text-2xl font-bold tracking-wide">Yaumiyyah</h1>
+            <p class="text-emerald-100 text-sm opacity-90">Pantau ibadah harianmu</p>
+        </div>
+
+        <div id="alertArea" class="space-y-3 mb-4">
+            <button id="btnInstall" class="hidden w-full rounded-2xl px-4 py-3 flex items-center justify-between bg-white/15 backdrop-blur border border-white/20 text-white hover:bg-white/20 transition">
+                <div class="flex items-center gap-3">
+                    <div class="bg-white/20 w-8 h-8 flex items-center justify-center rounded-lg"><i class="fa-solid fa-download text-sm"></i></div>
+                    <div class="text-left">
+                        <p class="font-bold text-xs">Instal Aplikasi</p>
+                        <p class="text-[10px] opacity-80">Akses lebih cepat & offline</p>
+                    </div>
+                </div>
+                <span class="text-[10px] bg-white/20 px-2 py-1 rounded-full font-bold">Instal</span>
+            </button>
+            
+            <button id="btnShowNotifModal" class="hidden w-full rounded-2xl px-4 py-3 flex items-center justify-between bg-white/15 backdrop-blur border border-white/20 text-white hover:bg-white/20 transition">
+                <div class="flex items-center gap-3">
+                    <div class="bg-white/20 w-8 h-8 flex items-center justify-center rounded-lg"><i class="fa-solid fa-bell text-sm"></i></div>
+                    <div class="text-left">
+                        <p class="font-bold text-xs">Aktifkan Notifikasi Harian</p>
+                        <p class="text-[10px] opacity-80">Pengingat input jam 16:00</p>
+                    </div>
+                </div>
+                <span class="text-[10px] bg-white/20 px-2 py-1 rounded-full font-bold">Aktifkan</span>
+            </button>
+        </div>
+
+        <div class="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden relative min-h-[340px] transition-all duration-500">
+            
+            <div id="loginForm" class="p-8 transition-opacity duration-300">
+                <h2 class="text-xl font-bold text-gray-800 mb-6 text-center">Masuk Akun</h2>
+                <div class="space-y-4">
+                    <div id="displayNameWrap" class="hidden">
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1 ml-1">Nama Sapaan</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400"><i class="fa-solid fa-id-badge text-sm"></i></div>
+                            <input type="text" id="displayName" class="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 outline-none transition" placeholder="Misal: Tim-Mutu" />
+                        </div>
+                        <p class="text-[11px] text-gray-500 mt-1 ml-1">Dipakai untuk salam. Saat daftar, wajib diisi.</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1 ml-1">Email</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400"><i class="fa-solid fa-user text-sm"></i></div>
+                            <input type="text" id="username" class="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-emerald-500 focus:bg-white transition text-sm font-semibold text-gray-700" placeholder="Email Anda">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1 ml-1">Password</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400"><i class="fa-solid fa-lock text-sm"></i></div>
+                            <input type="password" id="password" class="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-emerald-500 focus:bg-white transition text-sm font-semibold text-gray-700" placeholder="••••••••">
+                        </div>
+                    </div>
+                    <div class="flex gap-3">
+    <button id="btnLogin" class="w-1/2 bg-emerald-600 text-white rounded-xl py-3 font-bold hover:bg-emerald-700 transition active:scale-95 flex items-center justify-center gap-2">
+        <span>Masuk</span> <i class="fa-solid fa-arrow-right"></i>
+    </button>
+
+    <button id="btnSignup" class="w-1/2 bg-white border border-gray-200 text-gray-800 rounded-xl py-3 font-bold hover:bg-gray-50 transition active:scale-95 flex items-center justify-center gap-2">
+        <span>Daftar</span> <i class="fa-solid fa-user-plus text-emerald-600"></i>
+    </button>
+</div>
+
+                    <div id="authHint" class="text-xs text-gray-500 text-center mt-3">
+                      Belum punya akun? Klik <b>Daftar</b> → isi <b>Nama Sapaan</b> → klik <b>Daftar</b> lagi, lalu cek email untuk verifikasi.
+                    </div>
+                </div>
+            </div>
+
+            <div id="welcomeScreen" class="absolute inset-0 bg-white z-20 hidden flex flex-col items-center justify-center p-6 text-center opacity-0 transition-opacity duration-700">
+                <div class="flex-1 flex flex-col items-center justify-center w-full">
+                    <div class="w-24 h-24 bg-emerald-50 rounded-full flex items-center justify-center mb-6 animate-bounce shadow-sm border border-emerald-100 mx-auto">
+                        <i class="fa-solid fa-handshake text-4xl text-emerald-600"></i>
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <p class="text-gray-400 text-xs font-bold uppercase tracking-widest">Ahlan wa Sahlan</p>
+                        <h3 id="welcomeName" class="text-2xl font-black text-gray-800 leading-tight px-4">...</h3>
+                    </div>
+
+                    <div class="mt-10 flex items-center justify-center gap-2 text-emerald-600 text-xs font-medium animate-pulse bg-emerald-50 px-4 py-2 rounded-full">
+                        <i class="fa-solid fa-circle-notch fa-spin"></i>
+                        <span>Menyiapkan Jurnal...</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <p class="text-center text-gray-400 text-xs mt-8">© 2024 Aplikasi Ibadah Pegawai</p>
+    </div>
+
+    <div id="notifModal" class="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-white p-6 rounded-[2rem] w-4/5 max-w-xs shadow-2xl transform scale-95 transition-transform duration-300" id="notifCard">
+            <div class="text-center">
+                <div class="w-20 h-20 bg-amber-50 text-amber-500 rounded-full flex items-center justify-center mx-auto mb-5 text-3xl shadow-inner animate-pulse">
+                    <i class="fa-solid fa-bell"></i>
+                </div>
+                
+                <h3 class="font-bold text-gray-800 text-lg mb-2">Jangan Lewatkan Pahala</h3>
+                <p class="text-gray-500 text-xs leading-relaxed mb-6">
+                    Izinkan notifikasi agar kami bisa mengingatkan target ibadah harianmu tepat waktu.
+                </p>
+                
+                <div class="space-y-3">
+                    <button id="btnConfirmNotif" class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm transition shadow-lg shadow-emerald-200">
+                        Ya, Aktifkan
+                    </button>
+                    <button onclick="closeNotifModal()" class="w-full py-3 bg-transparent hover:bg-gray-50 text-gray-400 rounded-xl font-bold text-xs transition">
+                        Nanti Saja
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script>
+        // Cek sesi (Supabase Auth)
+        try { redirectIfAuthed('dashboard.html'); } catch (e) {}
+
+        // --- 1. LOGIC PWA (Install & Notif UI) ---
+        const btnInstall = document.getElementById('btnInstall');
+        const btnShowNotifModal = document.getElementById('btnShowNotifModal');
+        let deferredPrompt;
+        
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+
+        // Cek Izin Notifikasi saat startup (hanya jika mode aplikasi)
+        if (isStandalone) { checkNotificationPermission(); } 
+        else {
+            // Event Install
+            window.addEventListener('beforeinstallprompt', (e) => { 
+                e.preventDefault(); 
+                deferredPrompt = e; 
+                btnInstall.classList.remove('hidden'); 
+            });
+        }
+        
+        btnInstall.addEventListener('click', async () => {
+            if (deferredPrompt) { 
+                deferredPrompt.prompt(); 
+                const { outcome } = await deferredPrompt.userChoice; 
+                if (outcome === 'accepted') btnInstall.classList.add('hidden'); 
+                deferredPrompt = null; 
+            }
+        });
+
+        function checkNotificationPermission() {
+            if (('serviceWorker' in navigator) && ('PushManager' in window)) {
+                if (Notification.permission === 'default') btnShowNotifModal.classList.remove('hidden');
+                else if (Notification.permission === 'granted') registerPush(); // Pastikan tersubscribe di background
+            }
+        }
+
+        // --- MODAL NOTIFIKASI ---
+        function showNotifModal() {
+            const m = document.getElementById('notifModal'), c = document.getElementById('notifCard');
+            m.classList.remove('hidden');
+            setTimeout(()=> { m.classList.remove('opacity-0'); c.classList.remove('scale-95'); c.classList.add('scale-100');}, 10);
+        }
+
+        function closeNotifModal() {
+            const m = document.getElementById('notifModal'), c = document.getElementById('notifCard');
+            m.classList.add('opacity-0'); c.classList.remove('scale-100'); c.classList.add('scale-95');
+            setTimeout(()=> m.classList.add('hidden'), 300);
+        }
+
+        btnShowNotifModal.addEventListener('click', showNotifModal);
+
+        document.getElementById('btnConfirmNotif').addEventListener('click', async () => {
+            closeNotifModal();
+            const permission = await Notification.requestPermission();
+            if (permission === 'granted') {
+                registerPush();
+                btnShowNotifModal.classList.add('hidden');
+            }
+        });
+
+        // --- LOGIC TEKNIS PUSH NOTIFIKASI ---
+        function urlBase64ToUint8Array(base64String) {
+            const padding = '='.repeat((4 - base64String.length % 4) % 4); 
+            const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/'); 
+            const rawData = window.atob(base64); 
+            const outputArray = new Uint8Array(rawData.length); 
+            for (let i = 0; i < rawData.length; ++i) outputArray[i] = rawData.charCodeAt(i); 
+            return outputArray;
+        }
+
+        async function registerPush() {
+          try {
+            const reg = await navigator.serviceWorker.ready;
+            if (typeof PUBLIC_VAPID_KEY === 'undefined') {
+              console.warn('PUBLIC_VAPID_KEY belum ada (cek config.js)');
+              return;
+            }
+        
+            let sub = await reg.pushManager.getSubscription();
+            if (!sub) {
+              sub = await reg.pushManager.subscribe({
+                userVisibleOnly: true,
+                applicationServerKey: urlBase64ToUint8Array(PUBLIC_VAPID_KEY)
+              });
+            }
+        
+            // simpan sementara
+            localStorage.setItem('temp_push_sub', JSON.stringify(sub));
+        
+            // kalau sudah login, langsung nyangkut ke DB
+            try {
+              const { data: { user } } = await db.auth.getUser();
+              if (user && user.id) {
+                await upsertPushSubscription(user.id, sub);
+                localStorage.removeItem('temp_push_sub');
+              }
+            } catch (e) {}
+        
+            btnShowNotifModal.classList.add('hidden');
+          } catch (err) {
+            console.error("Push Error:", err);
+          }
+        }
+
+        if ('serviceWorker' in navigator) { 
+            window.addEventListener('load', () => { 
+                navigator.serviceWorker.register('/sw.js').then(() => { 
+                    if(isStandalone) checkNotificationPermission(); 
+                }); 
+            }); 
+        }
+
+        // --- 2. LOGIC LOGIN (FIXED) ---
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const btnLogin = document.getElementById('btnLogin');
+        const loginForm = document.getElementById('loginForm');
+        const welcomeScreen = document.getElementById('welcomeScreen');
+        const welcomeName = document.getElementById('welcomeName');
+
+        function showToast(message, type = 'info') {
+    const area = document.getElementById('alertArea');
+    if (!area) return alert(message);
+
+    const map = {
+        info: { cls: 'bg-gray-50 border-gray-200 text-gray-800', icon: 'fa-circle-info text-gray-500' },
+        ok:   { cls: 'bg-emerald-50 border-emerald-200 text-emerald-900', icon: 'fa-circle-check text-emerald-600' },
+        err:  { cls: 'bg-rose-50 border-rose-200 text-rose-900', icon: 'fa-triangle-exclamation text-rose-600' },
+        warn: { cls: 'bg-amber-50 border-amber-200 text-amber-900', icon: 'fa-circle-exclamation text-amber-600' }
+    };
+    const v = map[type] || map.info;
+
+    const id = 't_' + Math.random().toString(36).slice(2);
+    area.insertAdjacentHTML('afterbegin', `
+      <div id="${id}" class="w-full rounded-xl px-4 py-3 border ${v.cls}">
+        <div class="flex items-start gap-3">
+          <i class="fa-solid ${v.icon} mt-0.5"></i>
+          <div class="text-sm leading-snug">${message}</div>
+        </div>
+      </div>
+    `);
+
+    // auto-dismiss
+    setTimeout(() => {
+      const el = document.getElementById(id);
+      if (el) el.remove();
+    }, 6000);
+}
+
+function prettyAuthError(err) {
+    const msg = String(err?.message || '').toLowerCase();
+    if (msg.includes('invalid login credentials')) return 'Email atau password salah. Pastikan sudah terdaftar, atau klik Daftar.';
+    if (msg.includes('email not confirmed') || msg.includes('not confirmed')) return 'Email belum diverifikasi. Silakan cek inbox/spam, lalu klik link verifikasi.';
+    if (msg.includes('too many requests')) return 'Terlalu banyak percobaan. Coba lagi beberapa saat.';
+    if (msg.includes('password') && msg.includes('length')) return 'Password terlalu pendek. Minimal 6 karakter.';
+    if (msg.includes('user already registered') || msg.includes('already exists')) return 'Email sudah terdaftar. Silakan login.';
+    if (msg.includes('invalid') && msg.includes('email')) return 'Format email tidak valid.';
+    return err?.message || 'Terjadi kesalahan. Coba lagi.';
+}
+
+function baseFolderUrl() {
+    const u = new URL(window.location.href);
+    u.hash = '';
+    u.search = '';
+    u.pathname = u.pathname.replace(/[^/]*$/, '');
+    return u.toString();
+}
+
+// Jika sudah login, langsung ke dashboard
+try { redirectIfAuthed('dashboard.html'); } catch(e) {}
+
+// Mode daftar: tampilkan input nama sapaan agar user ngerti harus isi
+const displayNameWrap = document.getElementById('displayNameWrap');
+const displayNameInput = document.getElementById('displayName');
+
+function showSignupMode(on = true) {
+    if (!displayNameWrap) return;
+    if (on) displayNameWrap.classList.remove('hidden');
+    else displayNameWrap.classList.add('hidden');
+}
+
+async function setWelcomeName() {
+    try {
+        const { data: { user } } = await db.auth.getUser();
+        const meta = user?.user_metadata || {};
+        const nm = (meta.display_name || meta.name || meta.full_name || '').trim()
+                  || ((user?.email || '').split('@')[0] || '');
+        const wn = document.getElementById('welcomeName');
+        if (wn) wn.textContent = nm || '...';
+    } catch (e) {}
+}
+
+async function handleLogin() {
+    const email = usernameInput.value.trim();
+    const password = passwordInput.value;
+
+    if (!email || !password) { showToast("Isi email & password.", "err"); return; }
+
+    btnLogin.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i>';
+    btnLogin.disabled = true;
+
+    try {
+        await signInEmail(email, password);
+
+        // temp subscription yang dibuat sebelum login → tempel ke user
+        try {
+            const { data: { user } } = await db.auth.getUser();
+            const raw = localStorage.getItem('temp_push_sub');
+            if (user && raw) {
+                const sub = JSON.parse(raw);
+                await upsertPushSubscription(user.id, sub);
+                localStorage.removeItem('temp_push_sub');
+            }
+        } catch (e) { console.warn('push sub attach skipped:', e); }
+
+        await setWelcomeName();
+
+        // tampilkan welcome screen seperti versi lama
+        try {
+            welcomeScreen.classList.remove('hidden');
+            setTimeout(() => welcomeScreen.classList.remove('opacity-0'), 50);
+        } catch(e) {}
+
+        setTimeout(() => { window.location.href = 'dashboard.html'; }, 1200);
+    } catch (err) {
+        console.error(err);
+        showToast(prettyAuthError(err), "err");
+        btnLogin.innerHTML = '<span>Masuk</span> <i class="fa-solid fa-arrow-right"></i>';
+        btnLogin.disabled = false;
+    }
+}
+
+async function handleSignup() {
+    // Pertama kali klik: tampilkan field nama sapaan biar jelas
+    if (displayNameWrap && displayNameWrap.classList.contains('hidden')) {
+        showSignupMode(true);
+        showToast("Isi Nama Sapaan, lalu klik Daftar lagi.", "info");
+        return;
+    }
+
+    const email = usernameInput.value.trim();
+    const password = passwordInput.value;
+    const displayName = (displayNameInput?.value || '').trim();
+
+    if (!displayName) { showToast("Nama Sapaan wajib diisi saat daftar.", "warn"); return; }
+    if (!email || !password) { showToast("Isi email & password.", "err"); return; }
+
+    const btn = document.getElementById('btnSignup');
+    if (btn) { btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i>'; btn.disabled = true; }
+
+    try {
+        const { data, error } = await db.auth.signUp({
+            email,
+            password,
+            options: {
+                emailRedirectTo: baseFolderUrl() + 'dashboard.html',
+                data: { display_name: displayName }
+            }
+        });
+        if (error) throw error;
+
+        // Kalau email confirmation OFF, session bisa langsung ada
+        if (data?.session) {
+            showToast("Akun dibuat & login berhasil ✅", "ok");
+            await setWelcomeName();
+            try {
+                welcomeScreen.classList.remove('hidden');
+                setTimeout(() => welcomeScreen.classList.remove('opacity-0'), 50);
+            } catch(e) {}
+            setTimeout(() => { window.location.href = 'dashboard.html'; }, 1200);
+            return;
+        }
+
+        showToast("Pendaftaran berhasil ✅ Silakan cek email (Inbox/Spam) untuk verifikasi, lalu kembali login.", "ok");
+        showSignupMode(false);
+        if (displayNameInput) displayNameInput.value = '';
+    } catch (err) {
+        console.error(err);
+        showToast(prettyAuthError(err), "err");
+    } finally {
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = '<span>Daftar (Verifikasi Email)</span> <i class="fa-solid fa-user-plus text-emerald-600"></i>';
+        }
+    }
+}
+
+btnLogin.addEventListener('click', handleLogin);
+const btnSignup = document.getElementById('btnSignup');
+if (btnSignup) btnSignup.addEventListener('click', handleSignup);</script>
+</body>
+</html>

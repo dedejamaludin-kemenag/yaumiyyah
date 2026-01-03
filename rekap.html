@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Jurnal Ibadah</title>
+    <meta name="theme-color" content="#047857"> 
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --bg-main: #f6f7f4; --bg-card: #ffffff; --text-main: #1f2937; }
+        body { background: var(--bg-main); color: var(--text-main); font-family: sans-serif; padding-bottom: 110px; }
+        .details-box { transition: max-height 0.3s ease-out; max-height: 0; overflow: hidden; }
+        .expanded .details-box { max-height: 1000px; transition: max-height 0.5s ease-in; }
+        .chevron { transition: transform 0.3s; }
+        .expanded .chevron { transform: rotate(180deg); }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="text-white p-6 pb-8 rounded-b-[2.5rem] shadow-xl mb-6 sticky top-0 z-40 bg-[#047857]">
+        
+        <div class="flex justify-between items-center mb-4">
+            <div>
+                <h1 class="font-bold text-2xl">Jurnal Ibadah</h1>
+                <p class="text-emerald-100 text-xs mt-1 opacity-90" id="headerDate">Memuat...</p>
+            </div>
+            <button onclick="showLogoutModal()" class="bg-black/20 backdrop-blur-sm p-3 rounded-2xl text-xs hover:bg-black/30 transition shadow-sm border border-white/10">
+                <i class="fa-solid fa-power-off text-white"></i>
+            </button>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 mt-6">
+            <div class="bg-white/10 backdrop-blur-md rounded-2xl p-3 border border-white/20">
+                <p class="text-[10px] text-emerald-100 opacity-80 uppercase font-bold">Tercapai</p>
+                <div class="flex items-center gap-2 mt-1">
+                    <div class="w-3 h-3 bg-emerald-400 rounded border border-white/50"></div>
+                    <span class="text-xs font-bold text-white">Target terpenuhi</span>
+                </div>
+            </div>
+            <div class="bg-white/10 backdrop-blur-md rounded-2xl p-3 border border-white/20">
+                <p class="text-[10px] text-emerald-100 opacity-80 uppercase font-bold">Belum</p>
+                <div class="flex items-center gap-2 mt-1">
+                    <div class="w-3 h-3 bg-rose-400 rounded border border-white/50"></div>
+                    <span class="text-xs font-bold text-white">Masih kurang</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="listContainer" class="px-4 max-w-md mx-auto space-y-3 pb-6 -mt-2">
+        <div class="text-center py-10 opacity-60"><i class="fa-solid fa-circle-notch fa-spin text-2xl text-emerald-600 mb-2"></i><p class="text-sm">Memuat riwayat...</p></div>
+    </div>
+
+    <div class="fixed bottom-6 left-4 right-4 bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-gray-100 max-w-md mx-auto z-50">
+        <div class="flex justify-between px-6 py-3">
+            <a href="dashboard.html" class="flex flex-col items-center transition text-gray-400 hover:text-emerald-600 group"><div class="w-10 h-10 rounded-2xl flex items-center justify-center bg-transparent group-hover:bg-emerald-50 transition"><i class="fa-solid fa-pen-to-square text-xl mb-1"></i></div><span class="text-[10px] font-bold">Input</span></a>
+            <a href="rekap.html" class="flex flex-col items-center transition text-emerald-700"><div class="w-10 h-10 rounded-2xl flex items-center justify-center bg-emerald-100 text-emerald-700 shadow-sm"><i class="fa-solid fa-book-open text-xl mb-1"></i></div><span class="text-[10px] font-bold">Jurnal</span></a>
+            <a href="stats.html" class="flex flex-col items-center transition text-gray-400 hover:text-emerald-600 group"><div class="w-10 h-10 rounded-2xl flex items-center justify-center bg-transparent group-hover:bg-emerald-50 transition"><i class="fa-solid fa-chart-pie text-xl mb-1"></i></div><span class="text-[10px] font-bold">Statistik</span></a>
+        </div>
+    </div>
+
+    <div id="logoutModal" class="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-white p-6 rounded-3xl w-4/5 max-w-xs shadow-2xl transform scale-95 transition-transform duration-300" id="logoutCard">
+            <div class="text-center">
+                <div class="w-16 h-16 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl"><i class="fa-solid fa-right-from-bracket"></i></div>
+                <h3 class="font-bold text-gray-800 text-lg">Ingin Keluar?</h3>
+                <p class="text-gray-500 text-xs mt-2 mb-6 leading-relaxed">Sesi anda akan diakhiri dan anda harus login kembali untuk mengakses data.</p>
+                <div class="flex gap-3">
+                    <button onclick="closeLogoutModal()" class="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-bold text-sm transition">Batal</button>
+                    <button onclick="confirmLogout()" class="flex-1 py-3 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-bold text-sm transition shadow-lg shadow-rose-200">Keluar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script>
+        document.getElementById('headerDate').innerText = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+        let user = null;
+
+        async function boot() {
+            user = await requireAuth('index.html');
+            
+            initAutoLogout({ minutes: 5, redirect: 'index.html' });
+if (!user) return;
+            init();
+        }
+function showLogoutModal() { const m = document.getElementById('logoutModal'), c = document.getElementById('logoutCard'); m.classList.remove('hidden'); setTimeout(()=> { m.classList.remove('opacity-0'); c.classList.remove('scale-95'); c.classList.add('scale-100');}, 10);}
+        function closeLogoutModal() { const m = document.getElementById('logoutModal'), c = document.getElementById('logoutCard'); m.classList.add('opacity-0'); c.classList.remove('scale-100'); c.classList.add('scale-95'); setTimeout(()=> m.classList.add('hidden'), 300);}
+        function confirmLogout() { logout(); }
+
+        function getLocalISODate(d) { const offset = d.getTimezoneOffset() * 60000; return new Date(d.getTime() - offset).toISOString().split('T')[0]; }
+
+        function isFriday(dateISO) {
+            const d = new Date(dateISO + "T00:00:00+07:00");
+            return d.getDay() === 5;
+        }
+
+        let ITEMS = [];
+
+        function toggleCard(el) { document.querySelectorAll('.expanded').forEach(e => { if(e !== el) e.classList.remove('expanded'); }); el.classList.toggle('expanded'); }
+
+        async function init() {
+            try {
+                const { data: items } = await db.from('yaumiyyah_items').select('*').eq('is_active', true).order('sort_order');
+                ITEMS = items || [];
+                if (window.applyYaumiyyahOverrides) window.applyYaumiyyahOverrides(ITEMS);
+                const { data: logs } = await db.from('yaumiyyah_daily').select('log_date, checks').eq('user_id', user.id).order('log_date', { ascending: false }).limit(30);
+                renderList(logs || []);
+            } catch (err) { console.error(err); }
+        }
+
+        function renderList(logs) {
+            const container = document.getElementById('listContainer');
+            container.innerHTML = '';
+
+            const todayStr = getLocalISODate(new Date());
+            // dianggap "terlapor" kalau ada minimal 1 input bermakna (angka > 0 atau bool true/1)
+            // NOTE: item kategori Jumat hanya dihitung jika tanggalnya Jumat
+            const hasAnyInputForDate = (dateStr, checks) => {
+                if (!checks) return false;
+                const friday = isFriday(dateStr);
+                const dayItems = ITEMS.filter(it => (it.category === 'jumat' ? friday : true));
+                for (const it of dayItems) {
+                    const v = checks[it.code];
+                    if (v === true) return true;
+                    if (v === 1) return true;
+                    if (typeof v === 'number' && v > 0) return true;
+                }
+                return false;
+            };
+
+            // Tampilkan hanya: Hari ini + tanggal yang benar-benar diisi oleh user
+            const datesSet = new Set();
+// tampilkan minimal 30 hari terakhir (termasuk hari ini)
+for (let i = 0; i < 30; i++) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    datesSet.add(getLocalISODate(d));
+}
+// pastikan semua tanggal yang punya log juga ikut tampil (meski nilainya 0)
+(logs || []).forEach(l => {
+    if (!l || !l.log_date) return;
+    datesSet.add(l.log_date);
+});
+const dates = Array.from(datesSet).sort((a, b) => b.localeCompare(a));
+
+            dates.forEach(dateStr => {
+                const log = (logs || []).find(l => l.log_date === dateStr);
+                const checks = log ? (log.checks || {}) : {};
+                const filled = hasAnyInputForDate(dateStr, checks);
+
+                const dateObjParts = dateStr.split('-').map(Number);
+                const dateObj = new Date(dateObjParts[0], dateObjParts[1] - 1, dateObjParts[2]);
+                const dayName = dateObj.toLocaleDateString('id-ID', { weekday: 'long' });
+                const dateNum = dateObj.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+                let totalWeight = 0, achievedWeight = 0, detailsHTML = '';
+
+                const friday = isFriday(dateStr);
+                const dayItems = ITEMS.filter(it => (it.category === 'jumat' ? friday : true));
+
+                dayItems.forEach(item => {
+                    let raw = checks[item.code];
+                    let val = (raw === true) ? 1 : (typeof raw === 'number' ? raw : 0);
+
+                    const target = item.target_min || 1;
+                    const isCompleted = val >= target;
+
+                    totalWeight += (item.weight || 1);
+                    if (isCompleted) achievedWeight += (item.weight || 1);
+
+                    const cardCls = isCompleted ? 'bg-emerald-50 border-emerald-200' : 'bg-rose-50 border-rose-200';
+                    const textCls = isCompleted ? 'text-emerald-800' : 'text-rose-700';
+                    const iconBg = isCompleted ? 'bg-white text-emerald-600' : 'bg-white text-rose-400';
+
+                    let valueDisplay = '';
+                    if(item.input_type === 'bool') valueDisplay = isCompleted ? 'Ya' : 'Belum';
+                    else valueDisplay = `${val} <span class="opacity-60">/${target}</span>`;
+
+                    detailsHTML += `
+                        <div class="flex items-center gap-3 p-3 rounded-2xl border min-w-0 ${cardCls}">
+                            <div class="w-8 h-8 rounded-full ${iconBg} border border-white/50 shadow-sm flex items-center justify-center text-xs"><i class="fa-solid ${item.icon}"></i></div>
+                            <div class="flex-1"><p class="text-[10px] ${textCls} uppercase font-extrabold opacity-70 mb-0.5">${item.name}</p><p class="text-xs font-black ${textCls}">${valueDisplay}</p></div>
+                        </div>`;
+                });
+
+                // Kalau belum ada laporan bermakna, tampilkan sebagai "Belum Diisi"
+                const progressPct = (filled && totalWeight > 0) ? Math.round((achievedWeight / totalWeight) * 100) : 0;
+
+                let badgeClass = "bg-rose-100 text-rose-700 border-rose-200";
+                let badgeText = "Belum Diisi";
+                if (filled) {
+                    if (progressPct >= 100) { badgeClass = "bg-emerald-100 text-emerald-700 border-emerald-200"; badgeText = "Sempurna"; }
+                    else if (progressPct >= 50) { badgeClass = "bg-amber-100 text-amber-700 border-amber-200"; badgeText = "Baik"; }
+                    else { badgeClass = "bg-rose-100 text-rose-700 border-rose-200"; badgeText = "Kurang"; }
+                }
+
+                
+
+let pctClass = "bg-white text-rose-700 border-rose-200";
+if (filled) {
+    if (progressPct >= 100) pctClass = "bg-white text-emerald-700 border-emerald-200";
+    else if (progressPct >= 50) pctClass = "bg-white text-amber-700 border-amber-200";
+    else pctClass = "bg-white text-rose-700 border-rose-200";
+}container.innerHTML += `
+                    <div class="bg-[var(--bg-card)] rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-3 group" onclick="toggleCard(this)">
+                        <div class="p-4">
+                            <div class="flex justify-between items-center mb-3">
+                                <div class="flex items-center gap-3">
+                                    <div class="bg-gray-100 w-10 h-10 rounded-xl flex flex-col items-center justify-center text-gray-600"><span class="text-[8px] uppercase font-bold">${dayName.substring(0,3)}</span><span class="text-sm font-black leading-none">${dateObj.getDate()}</span></div>
+                                    <div><h3 class="font-bold text-gray-800 text-sm">${dayName}, ${dateNum}</h3><div class="flex items-center gap-2 mt-0.5"><span class="text-[10px] px-2 py-0.5 rounded-full border ${badgeClass} font-bold">${badgeText}</span><span class="text-[10px] px-2 py-0.5 rounded-full border ${pctClass} font-bold">${progressPct}%</span></div></div>
+                                </div>
+                                <div class="w-6 h-6 flex items-center justify-center rounded-full bg-gray-50 group-hover:bg-gray-100 transition"><i class="fa-solid fa-chevron-down text-gray-400 chevron text-xs"></i></div>
+                            </div>
+                            <div class="w-full h-2 bg-gray-100 rounded-full overflow-hidden"><div class="h-full bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-full" style="width:${Math.max(progressPct, 5)}%"></div></div>
+                        </div>
+                        <div class="details-box bg-gray-50/50 border-t border-dashed border-gray-200"><div class="p-4">${filled ? `<div class="grid grid-cols-2 gap-2">${detailsHTML}</div>` : `<p class="text-center text-xs text-gray-400 py-2 italic">Belum ada laporan.</p>`}</div></div>
+                    </div>`;
+            });
+        }
+    window.addEventListener("DOMContentLoaded", boot);
+</script>
+</body>
+</html>

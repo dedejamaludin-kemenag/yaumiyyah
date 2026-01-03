@@ -1,0 +1,6 @@
+{
+  "crons": [
+    { "path": "/api/push-daily?key=BAZKvBchATdERoL2vbim4a_QQvLGSYQhj9tYXoR5GpIbeZs2zs5kU5PP0UDQnHbzo58JJrToS_GdEyZKE7AhJ8w", "schedule": "0 22 * * *" },
+    { "path": "/api/push-reminder?key=BAZKvBchATdERoL2vbim4a_QQvLGSYQhj9tYXoR5GpIbeZs2zs5kU5PP0UDQnHbzo58JJrToS_GdEyZKE7AhJ8w", "schedule": "0 9 * * *" }
+  ]
+}
