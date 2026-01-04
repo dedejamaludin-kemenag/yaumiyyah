@@ -115,8 +115,10 @@ self.addEventListener("push", (event) => {
   const title = data.title || "Pesan Harian";
   const options = {
     body: data.body || "Buka aplikasi untuk membaca.",
-    icon: data.icon || "/icons/icon-192.png",
-    badge: data.badge || "/icons/badge-72.png",
+    // Repo ini menyimpan ikon di root (192x192.png / 512x512.png).
+    // Hindari path /icons/* yang tidak ada agar notifikasi tidak memunculkan 404.
+    icon: data.icon || "/192x192.png",
+    badge: data.badge || "/192x192.png",
     data: { url: data.url || "/rekap.html" }
   };
 
