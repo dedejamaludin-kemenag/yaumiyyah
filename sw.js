@@ -1,8 +1,15 @@
-const CACHE_NAME = 'yaumiyyah-cache-v11';
+const CACHE_NAME = 'yaumiyyah-cache-v12';
 const CORE_ASSETS = [
   './',
   './index.html',
-  './config.js'
+  './config.js',
+  './manifest.json',
+  './192x192.png',
+  './512x512.png',
+  './logo.png',
+  './splash.png',
+  './apple-touch-icon.png',
+  './favicon.ico'
 ];
 
 self.addEventListener('install', (event) => {
