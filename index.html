@@ -118,7 +118,6 @@
                 </div>
             </div>
         </div>
-        <div id="authToastArea" class="space-y-3 mt-4"></div>
         <p class="text-center text-gray-400 text-xs mt-8">© 2024 Aplikasi Ibadah Pegawai</p>
     </div>
 
@@ -289,7 +288,7 @@
     if (!st.box || !document.getElementById('authToastBox')) {
         const box = document.createElement('div');
         box.id = 'authToastBox';
-        box.className = 'mt-3 w-full max-w-md mx-auto border rounded-2xl px-4 py-3 flex items-start gap-3 shadow-sm';
+        box.className = 'w-full max-w-md mx-auto border rounded-2xl px-4 py-3 flex items-start gap-3 shadow-sm';
         box.setAttribute('role', 'status');
         box.setAttribute('aria-live', 'polite');
 
@@ -298,7 +297,8 @@
           <div class="text-sm leading-snug" id="authToastMsg"></div>
         `;
 
-        area.appendChild(box);
+        // Place toast at the top of the alert area (native-like)
+        area.prepend(box);
         st.box = box;
     }
 
@@ -309,7 +309,7 @@
 
     if (boxEl) {
         // reset classes to keep it deterministic
-        boxEl.className = 'mt-3 w-full max-w-md mx-auto border rounded-2xl px-4 py-3 flex items-start gap-3 shadow-sm ' + cfg.cls;
+        boxEl.className = 'w-full max-w-md mx-auto border rounded-2xl px-4 py-3 flex items-start gap-3 shadow-sm ' + cfg.cls;
     }
     if (iconEl) iconEl.className = 'fa-solid ' + cfg.icon;
     if (msgEl)  msgEl.textContent = message;
