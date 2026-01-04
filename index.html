@@ -279,66 +279,49 @@
         err:  { cls: 'bg-rose-50 border-rose-200 text-rose-900', icon: 'fa-triangle-exclamation text-rose-600' },
         warn: { cls: 'bg-amber-50 border-amber-200 text-amber-900', icon: 'fa-circle-exclamation text-amber-600' }
     };
+    const cfg = map[type] || map.info;
 
-    // Stack + de-duplicate toast lines (one box, 1-3 lines, no duplicates)
-    const rank = { info: 1, ok: 2, warn: 3, err: 4 };
-    window.__yaumiyyahToastState = window.__yaumiyyahToastState || {
-        box: null,
-        lines: new Map(),
-        timer: null,
-        level: 'info'
-    };
+    // Native-like: single line, always replaced (no stacking), repeated calls just refresh the same box
+    window.__yaumiyyahToastState = window.__yaumiyyahToastState || { box: null, timer: null };
+
     const st = window.__yaumiyyahToastState;
 
-    const key = String(message || '').trim();
-    if (!key) return;
-
-    // Choose the "strongest" color for the whole box
-    const nextLevel = (rank[type] || 1) >= (rank[st.level] || 1) ? type : st.level;
-    st.level = nextLevel;
-
-    // Ensure box exists (single container)
     if (!st.box || !document.getElementById('authToastBox')) {
-        st.lines.clear();
-        const v = map[st.level] || map.info;
-        area.innerHTML = `
-          <div id="authToastBox" class="w-full rounded-xl px-4 py-3 border ${v.cls}">
-            <div id="authToastLines" class="space-y-2"></div>
-          </div>
+        const box = document.createElement('div');
+        box.id = 'authToastBox';
+        box.className = 'mt-3 w-full max-w-md mx-auto border rounded-2xl px-4 py-3 flex items-start gap-3 shadow-sm';
+        box.setAttribute('role', 'status');
+        box.setAttribute('aria-live', 'polite');
+
+        box.innerHTML = `
+          <div class="pt-0.5"><i id="authToastIcon" class="fa-solid ${cfg.icon}"></i></div>
+          <div class="text-sm leading-snug" id="authToastMsg"></div>
         `;
-        st.box = document.getElementById('authToastBox');
-    } else {
-        // Update box color when level changes
-        const v = map[st.level] || map.info;
-        st.box.className = `w-full rounded-xl px-4 py-3 border ${v.cls}`;
+
+        area.appendChild(box);
+        st.box = box;
     }
 
-    const linesEl = document.getElementById('authToastLines');
-    if (!linesEl) return;
+    // Update style + content (replace)
+    const boxEl = document.getElementById('authToastBox');
+    const iconEl = document.getElementById('authToastIcon');
+    const msgEl  = document.getElementById('authToastMsg');
 
-    // Add line only if not exists
-    if (!st.lines.has(key)) {
-        const vLine = map[type] || map.info;
-        const line = document.createElement('div');
-        line.className = 'flex items-start gap-3 text-sm leading-snug';
-        line.innerHTML = `
-          <i class="fa-solid ${vLine.icon} mt-0.5"></i>
-          <div>${key}</div>
-        `;
-        linesEl.appendChild(line);
-        st.lines.set(key, line);
+    if (boxEl) {
+        // reset classes to keep it deterministic
+        boxEl.className = 'mt-3 w-full max-w-md mx-auto border rounded-2xl px-4 py-3 flex items-start gap-3 shadow-sm ' + cfg.cls;
     }
+    if (iconEl) iconEl.className = 'fa-solid ' + cfg.icon;
+    if (msgEl)  msgEl.textContent = message;
 
-    // Reset auto-dismiss for the whole stack
+    // Auto-dismiss (refresh timer on every call)
     if (st.timer) clearTimeout(st.timer);
     st.timer = setTimeout(() => {
         const box = document.getElementById('authToastBox');
         if (box) box.remove();
         st.box = null;
-        st.lines.clear();
         st.timer = null;
-        st.level = 'info';
-    }, 6000);
+    }, 5000);
 }
 
 function prettyAuthError(err) {

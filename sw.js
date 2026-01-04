@@ -1,4 +1,4 @@
-const CACHE_NAME = 'yaumiyyah-cache-v13';
+const CACHE_NAME = 'yaumiyyah-cache-v14';
 const CORE_ASSETS = [
   './',
   './index.html',
