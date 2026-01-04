@@ -112,8 +112,8 @@
                     </div>
                 </div>
             </div>
-
         </div>
+        <div id="authToastArea" class="space-y-3 mt-4"></div>
         <p class="text-center text-gray-400 text-xs mt-8">© 2024 Aplikasi Ibadah Pegawai</p>
     </div>
 
@@ -265,7 +265,7 @@
         const welcomeName = document.getElementById('welcomeName');
 
         function showToast(message, type = 'info') {
-    const area = document.getElementById('alertArea');
+    const area = document.getElementById('authToastArea') || document.getElementById('alertArea');
     if (!area) return alert(message);
 
     const map = {
