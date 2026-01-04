@@ -8,7 +8,7 @@
     <link rel="icon" href="favicon.ico">
     <link rel="icon" type="image/png" sizes="192x192" href="192x192.png">
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
-    <meta name="theme-color" content="#007850"> 
+    <meta name="theme-color" content="#047854"> 
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -17,9 +17,7 @@
 <body class="bg-gray-50 min-h-screen relative overflow-x-hidden">
 
     <!-- App Splash (in-app) -->
-    <div id="appSplash" class="fixed inset-0 z-[9999] flex items-center justify-center bg-[#007850] transition-opacity duration-700">
-        <img src="splash.png" alt="Yaumiyyah" class="w-72 max-w-[85vw] drop-shadow-2xl"/>
-    </div>
+    
 
 
     <div class="absolute top-0 left-0 w-full h-80 bg-[#007850] rounded-b-[3rem] z-0 shadow-xl"></div>
@@ -489,18 +487,6 @@ async function handleSignup() {
 btnLogin.addEventListener('click', handleLogin);
 const btnSignup = document.getElementById('btnSignup');
 if (btnSignup) btnSignup.addEventListener('click', handleSignup);
-        // --- APP SPLASH (in-app) ---
-        window.addEventListener('load', () => {
-            const sp = document.getElementById('appSplash');
-            if (!sp) return;
-            const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-            const delay = reduce ? 150 : 650;
-            setTimeout(() => {
-                sp.classList.add('opacity-0');
-                setTimeout(() => sp.remove(), 750);
-            }, delay);
-        });
-
-</script>
+        </script>
 </body>
 </html>

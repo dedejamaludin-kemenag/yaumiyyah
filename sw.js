@@ -1,4 +1,4 @@
-const CACHE_NAME = 'yaumiyyah-cache-v12';
+const CACHE_NAME = 'yaumiyyah-cache-v13';
 const CORE_ASSETS = [
   './',
   './index.html',
@@ -6,9 +6,9 @@ const CORE_ASSETS = [
   './manifest.json',
   './192x192.png',
   './512x512.png',
+  './splash-512.png',
   './logo.png',
-  './splash.png',
-  './apple-touch-icon.png',
+  '  './apple-touch-icon.png',
   './favicon.ico'
 ];
 
